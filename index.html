@@ -24,8 +24,8 @@
 'use strict';
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 const $=id=>document.getElementById(id);
-const coinEl=\(('coins'),lifeEl=\)('lives'),progEl=\(('progress'),levelEl=\)('level');
-const startScreen=\(('startScreen'),phasesScreen=\)('phasesScreen'),settingsScreen=\(('settingsScreen'),tutorialScreen=\)('tutorialScreen'),pauseScreen=\(('pauseScreen'),endScreen=\)('endScreen'),touchControls=\(('touchControls'),pauseBtn=\)('pauseBtn');
+const coinEl=$('coins'),lifeEl=$('lives'),progEl=$('progress'),levelEl=$('level');
+const startScreen=$('startScreen'),phasesScreen=$('phasesScreen'),settingsScreen=$('settingsScreen'),tutorialScreen=$('tutorialScreen'),pauseScreen=$('pauseScreen'),endScreen=$('endScreen'),touchControls=$('touchControls'),pauseBtn=$('pauseBtn');
 let W=0,H=0,cam=0,last=0,started=false,paused=false,ended=false,coins=0,lives=3,levelIndex=0,world=3200,jumpBuffer=0,savedLevel=0,unlockedStage=0,soundEnabled=true,keys={},touch={left:false,right:false,jump:false};
 let player,platforms,rings,enemies,particles,goal,audioCtx=null;
 const gravity=1800;
@@ -46,7 +46,7 @@ function sound(type){if(!soundEnabled)return;try{const AC=window.AudioContext||w
 function makeLevel(keepLives=false){const cfg=stages[levelIndex],groundY=H-92;world=cfg.world;platforms=cfg.gaps.map(([x1,x2])=>({x:x1,y:groundY,h:160,w:Math.min(x2,world)-x1}));
  for(const [x1,x2,yUp] of cfg.ledges){platforms.push({x:x1,y:groundY-yUp,w:x2-x1,h:18,ledge:true})}
  rings=[];for(const p of platforms.filter(p=>!p.ledge)){for(let x=p.x+75;x<p.x+p.w-30;x+=112){let near=platforms.find(q=>q.ledge&&x>q.x-25&&x<q.x+q.w+25);rings.push({x,y:near?near.y-28:groundY-47,got:false,phase:Math.random()*6.28})}}
- enemies=[];const main=platforms.filter(p=>!p.ledge);main.forEach((p,i)=>{if(p.w>220&&i>0){const count=levelIndex>=8&&i%2===1?2:1;for(let j=0;j<count;j++){const x=p.x+p.w*(count===1?.55:(j===0?.35:.68));enemies.push({x,y:groundY-34,min:p.x+25,max:p.x+p.w-65,v:(i%2?1:-1)*Math.min(190,72+levelIndex*4),alive:true})}});
+ enemies=[];const main=platforms.filter(p=>!p.ledge);main.forEach((p,i)=>{if(p.w>220&&i>0){const count=levelIndex>=8&&i%2===1?2:1;for(let j=0;j<count;j++){const x=p.x+p.w*(count===1?.55:(j===0?.35:.68));enemies.push({x,y:groundY-34,min:p.x+25,max:p.x+p.w-65,v:(i%2?1:-1)*Math.min(190,72+levelIndex*4),alive:true})}}});
  player={x:55,y:groundY-50,w:34,h:48,vx:0,vy:0,ground:false,face:1,inv:0,run:0};particles=[];goal={x:world-110,y:groundY-100};cam=0;coins=0;updateHud();if(!keepLives)lives=3;lifeEl.textContent=lives}
 function updateHud(){coinEl.textContent=coins;lifeEl.textContent=lives;progEl.textContent=Math.min(100,Math.floor(player.x/(world-80)*100))+'%';levelEl.textContent=levelIndex+1}
 function start(stage=savedLevel){requestLandscape();levelIndex=Math.max(0,Math.min(unlockedStage,stages.length-1,stage));savedLevel=levelIndex;lives=3;try{localStorage.setItem('turboContinueLevel',String(savedLevel))}catch(e){}makeLevel();started=true;paused=false;ended=false;pauseBtn.classList.remove('hidden');startScreen.classList.add('hidden');phasesScreen.classList.add('hidden');settingsScreen.classList.add('hidden');tutorialScreen.classList.add('hidden');pauseScreen.classList.add('hidden');endScreen.classList.add('hidden');last=performance.now();requestAnimationFrame(loop)}
@@ -69,16 +69,16 @@ $('homeBtn').onclick=()=>{paused=false;started=false;keys={};touch.left=touch.ri
 addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp',' ','ArrowDown'].includes(e.key))e.preventDefault();const key=e.key.toLowerCase();if(['arrowup','w',' '].includes(key)&&!keys[key])jumpBuffer=.22;keys[key]=true;if(!started&&e.key==='Enter')start()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 function bindHold(id,side){const b=$(id);b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);touch[side]=true;if(side==='jump')jumpBuffer=.22};b.onpointerup=b.onpointercancel=()=>touch[side]=false}bindHold('leftBtn','left');bindHold('rightBtn','right');bindHold('jumpBtn','jump');
 function showTouch(){touchControls.style.display=('ontouchstart'in window||navigator.maxTouchPoints>0||innerWidth<900)?'flex':'none'}showTouch();addEventListener('resize',showTouch);
-function finishStage(){if(ended)return;ended=true;started=false;pauseBtn.classList.add('hidden');const lastLevel=levelIndex===stages.length-1;if(!lastLevel){unlockedStage=Math.max(unlockedStage,levelIndex+1);savedLevel=levelIndex+1;try{localStorage.setItem('turboUnlockedStage',String(unlockedStage));localStorage.setItem('turboContinueLevel',String(savedLevel))}catch(e){}}sound('win');\(('endTitle').textContent=lastLevel?'Você venceu! 🎉':'Fase concluída! 🌟';\)('endText').textContent=lastLevel?`Parabéns! Você venceu as 30 fases!`:`Você terminou a fase \({levelIndex+1}: \){stages[levelIndex].name}. A fase \({levelIndex+2} foi desbloqueada!`;const b=\)('nextBtn');b.textContent=lastLevel?'JOGAR DE NOVO':'PRÓXIMA FASE';$('returnMenuBtn').classList.add('hidden');endScreen.classList.remove('hidden')}
+function finishStage(){if(ended)return;ended=true;started=false;pauseBtn.classList.add('hidden');const lastLevel=levelIndex===stages.length-1;if(!lastLevel){unlockedStage=Math.max(unlockedStage,levelIndex+1);savedLevel=levelIndex+1;try{localStorage.setItem('turboUnlockedStage',String(unlockedStage));localStorage.setItem('turboContinueLevel',String(savedLevel))}catch(e){}}sound('win');$('endTitle').textContent=lastLevel?'Você venceu! 🎉':'Fase concluída! 🌟';$('endText').textContent=lastLevel?`Parabéns! Você venceu as 30 fases!`:`Você terminou a fase ${levelIndex+1}: ${stages[levelIndex].name}. A fase ${levelIndex+2} foi desbloqueada!`;const b=$('nextBtn');b.textContent=lastLevel?'JOGAR DE NOVO':'PRÓXIMA FASE';$('returnMenuBtn').classList.add('hidden');endScreen.classList.remove('hidden')}
 function gameOver(){
   if(ended)return;
   ended=true;started=false;pauseBtn.classList.add('hidden');sound('lose');
   $('endTitle').textContent='Game Over';
-  \(('endText').textContent=`As vidas acabaram na fase \){levelIndex+1}. Você pegou ${coins} moedas. Vamos tentar de novo?`;
+  $('endText').textContent=`As vidas acabaram na fase ${levelIndex+1}. Você pegou ${coins} moedas. Vamos tentar de novo?`;
   $('nextBtn').textContent='JOGAR DE NOVO';
   $('returnMenuBtn').classList.remove('hidden');
   endScreen.classList.remove('hidden');
-  \(('nextBtn').onclick=()=>{ \)('nextBtn').onclick=nextLevel;start()};
+  $('nextBtn').onclick=()=>{ $('nextBtn').onclick=nextLevel;start()};
   if (window.AppInventor) {
       window.AppInventor.setWebViewString("gameover");
   }
